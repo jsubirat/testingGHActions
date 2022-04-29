@@ -10,13 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     # Restrict execution to PRs containing "newrelic-logging" in its title
     # if: contains(github.event.pull_request.title, 'newrelic-logging')
+    env:
+      JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+      JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      JIRA_FIELDS: ${{ secrets.JIRA_FIELDS }}
     steps:
       - name: Login to JIRA
         uses: atlassian/gajira-login@master
-        env:
-          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
 
       # Reference on available pull_request fields: https://docs.github.com/en/graphql/reference/objects#pullrequest
       - name: Create
@@ -32,7 +33,7 @@ jobs:
 
             h2. Description
             ${{ github.event.pull_request.body }}
-          fields: ${{ secrets.JIRA_FIELDS }}
+          fields: ${{ env.JIRA_FIELDS }}
 
       - name: Log created issue
         run: echo "Issue ${{ steps.create.outputs.issue }} was created"
@@ -45,16 +46,15 @@ jobs:
         id: update
         run: |
           sleep 20
+          echo '{ "fields": ${{ env.JIRA_FIELDS }} }' > body.json
+          cat body.json
           curl \
              -s \
              -D- \
              --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
              -X PUT \
-             --data '{ "fields": ${{ secrets.JIRA_FIELDS }} }' \
+             --data @body.json \
              -H "Content-Type: application/json" \
-             "$JIRA_BASE_URL/rest/api/2/issue/$JIRA_ISSUE"
+             "$JIRA_BASE_URL/rest/api/2/issue/$CREATED_JIRA_ISSUE"
         env:
-          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-          JIRA_ISSUE: ${{ steps.create.outputs.issue }}
+          CREATED_JIRA_ISSUE: ${{ steps.create.outputs.issue }}
