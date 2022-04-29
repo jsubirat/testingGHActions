@@ -2,12 +2,13 @@ on:
   pull_request_target:
     types: [opened]
 
-name: Create JIRA issue linked to newly created GitHub Pull Request
+name: Create LOGGING JIRA issue linked to newly created GitHub Pull Request
 
 jobs:
   create-jira-issue:
-    name: Create JIRA Ticket for new Issue
+    name: Create LOGGING JIRA Ticket for new Issue
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.title, 'newrelic-logging')
     steps:
       - name: Login to JIRA
         uses: atlassian/gajira-login@master

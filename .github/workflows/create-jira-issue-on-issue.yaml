@@ -6,8 +6,9 @@ name: Create JIRA issue linked to newly created GitHub issue
 
 jobs:
   create-jira-issue:
-    name: Create JIRA Ticket for new Issue
+    name: Create LOGGING JIRA Ticket for new Issue
     runs-on: ubuntu-latest
+    if: contains(github.event.issue.title, 'newrelic-logging')
     steps:
       - name: Login to JIRA
         uses: atlassian/gajira-login@master
