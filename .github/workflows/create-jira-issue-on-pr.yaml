@@ -8,7 +8,8 @@ jobs:
   create-jira-issue:
     name: Create LOGGING JIRA Ticket for new Issue
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.title, 'newrelic-logging')
+    # Restrict execution to PRs containing "newrelic-logging" in its title
+    # if: contains(github.event.pull_request.title, 'newrelic-logging')
     steps:
       - name: Login to JIRA
         uses: atlassian/gajira-login@master
@@ -17,7 +18,7 @@ jobs:
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
 
-      # Reference on available poll_request fields: https://docs.github.com/en/graphql/reference/objects#pullrequest
+      # Reference on available pull_request fields: https://docs.github.com/en/graphql/reference/objects#pullrequest
       - name: Create
         id: create
         uses: atlassian/gajira-create@master
