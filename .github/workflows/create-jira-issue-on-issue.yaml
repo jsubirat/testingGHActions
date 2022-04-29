@@ -47,7 +47,6 @@ jobs:
         id: update
         run: |
           sleep 20
-          cat body.json
           curl \
              -s \
              -D- \
