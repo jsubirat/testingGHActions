@@ -46,12 +46,14 @@ jobs:
         id: update
         run: |
           sleep 20
+          echo '{ "fields": $JIRA_FIELDS }' > body.json
+          cat body.json
           curl \
              -s \
              -D- \
              --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
              -X PUT \
-             --data '{ "fields": ${{ secrets.JIRA_FIELDS }} }' \
+             --data @body.json \
              -H "Content-Type: application/json" \
              "$JIRA_BASE_URL/rest/api/2/issue/$CREATED_JIRA_ISSUE"
         env:
